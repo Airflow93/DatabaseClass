@@ -19,7 +19,7 @@ BEGIN TRANSACTION;
    DROP TABLE IF EXISTS public.BankAccount CASCADE;
    DROP TABLE IF EXISTS public.Paypal CASCADE;
    DROP TABLE IF EXISTS public.CreditCard CASCADE;
-   DROP SCHEMA IF EXISTS CarShareDB CASCADE;  
+   DROP SCHEMA IF EXISTS CarShareDB CASCADE;
 COMMIT;
 
 -- This creates the schema and initiates all transactions at once until COMMIT;
@@ -48,13 +48,13 @@ CREATE TABLE CarShareDB.CarModel (
 make VARCHAR(20),
 model VARCHAR(20),
 category VARCHAR(20) NOT NULL,
-capacity SMALLINT,
+capacity SMALLINT CHECK(capacity BETWEEN 1 AND 8),
 PRIMARY KEY(make, model)
 );
 
 --By registration number does it mean the numbers on the form or the license plate?
 CREATE TABLE CarShareDB.Car (
-regno SMALLINT,
+regno CHAR(6),
 name VARCHAR(20) NOT NULL UNIQUE,
 year SMALLINT, -- Use smallint since date takes in day values
 transmission -- enums here since only a few types
@@ -65,6 +65,8 @@ PRIMARY KEY (regno),
 FOREIGN KEY (make, model) REFERENCES CarModel(make, model),
 FOREIGN KEY (carBayName) REFERENCES CarBay(name)
 );
+
+
 
 CREATE TABLE CarShareDB.CarBay (
 name VARCHAR(20),
@@ -94,7 +96,7 @@ password VARCHAR(20) NOT NULL, -- Check max / minimum length
 nickname VARCHAR(20) NOT NULL UNIQUE,
 memberTitle VARCHAR(10) NOT NULL, --mr., mrs., ms etc
 familyName VARCHAR(50) NOT NULL,
-givenName VarChar(50) NOT NULL, 
+givenName VarChar(50) NOT NULL,
 licenseNR VARCHAR() NOT NULL UNIQUE, --australian license length?
 licenseExpiry() NOT NULL,
 address VARCHAR(50) NOT NULL,
@@ -150,7 +152,7 @@ PRIMARY KEY(paymentNumber,paymentEmail),
 
 CREATE TABLE CarShareDB.CreditCard (
 cardNumber BIGINT,
-paymentNumber INTEGER, 
+paymentNumber INTEGER,
 paymentEmail VARCHAR(254),
 expires DATE, --Credit cards usually only have the months and date
 name VARCHAR(50),
@@ -163,10 +165,15 @@ FOREIGN KEY(paymentNumber, paymentEmail) REFERENCES PaymentMethod(num, email)
  *Inserting Example Data into the tables
 */
 --CarModel
-INSERT INTO CarModel VALUES();
-INSERT INTO CarModel VALUES();
-INSERT INTO CarModel VALUES();
-INSERT INTO CarModel VALUES();
+INSERT INTO CarModel VALUES('Nissan','Maxima','Sedan',5);
+INSERT INTO CarModel VALUES('Toyota','Corolla','Hatch',5);
+INSERT INTO CarModel VALUES('Bac','Mono','Sports',1);
+INSERT INTO CarModel VALUES('Chrysler','Sebring','Sedan',5);
+
+-- INSERT INTO CarModel VALUES('Nissan','Maxima',NULL,5); -- Violate NOT NULL CONSTRAINT
+-- INSERT INTO CarModel VALUES('Toyota','Corolla','Hatch',0); -- Violate MIN boundary for capacity
+-- INSERT INTO CarModel VALUES('Bac','Mono','Sports',9); -- Violate MAX boundary for capacity
+-- INSERT INTO CarModel VALUES('Chrysler','Sebring','Sedan',5);
 
 --Car
 INSERT INTO Car VALUES();
